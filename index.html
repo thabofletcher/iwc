@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>brave Robot</title>
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" href="style.css" type="text/css">
+		<script>
+		function $(id) {
+			var r;
+			r=document.getElementById(id);
+			if(r) return r;
+			r=document.getElementsByTagName(id);
+			if(r.length>0) return r;
+			r=document.getElementsByClassName(id);
+			if(r.length>0) return r;
+			return false;
+			}
+		
+		function reload() {
+			setTimeout(function(){window.scrollTo(0,1)},100);
+			
+			$('loading').style.display="block";
+			
+			var current=get('current.pl');
+			if (current!="") {
+				$('clockout').innerHTML=current;
+				$('current').style.display="block";
+				}
+			else $('current').style.display="none";
+			
+			var clients=get('clients.pl');
+			if (clients!="") {
+				$('clockin').innerHTML=clients;
+				$('clients').style.display="block";
+				}
+			else $('clients').style.display="none";
+				
+			$('loading').style.display="none";
+		
+		
+			items=$('li');
+			for(i=0;i<items.length;i++) {
+				items[i].onclick=function(e){if(!e)var e=window.event;
+					e.target.className="selected";
+					$('loading').style.display="block";
+					if(e.target.id.indexOf('cid')==0) setTimeout('clockin('+e.target.id.substr(4)+')',0);
+					else if (e.target.id.indexOf('tid')==0) setTimeout('clockout('+e.target.id.substr(4)+')',0);					
+					}
+				}
+			}
+		
+		function clockin(cid) {
+			get("clockin.pl?cid=" + cid);
+			reload();
+			}
+			
+		function clockout(tid) {
+			get("clockout.pl?tid=" + tid);
+			reload();
+			}
+			
+		function get(url) {
+			try{
+				xhr=false;
+				try{xhr=new ActiveXObject('Msxml2.XMLHTTP')}catch(e){
+				try{xhr=new ActiveXObject('Microsoft.XMLHTTP')}catch(E){xhr=false}}
+				if(!xhr){try{xhr=new XMLHttpRequest()}catch(e){xhr=false}}
+				if(!xhr){try{xhr=window.createRequest()}catch(e){xhr=false}}
+		
+				if(!xhr)
+					return "";
+		
+				xhr.open('GET',url,false);
+				xhr.send(null);
+				}
+			catch(BigE){return "";}
+			return xhr.responseText;
+			}	
+		</script>
+	</head>
+	<body onload="reload()"><div class="wrap">	
+		<div style="display:none" id="current">
+		<div class="section">
+		<span class="rightadj">Clock Out</span>
+		</div>
+
+		<div class="section">
+			<ul id="clockout">
+			</ul>
+		</div>
+		</div>
+		
+		<div style="display:none" id="clients">		
+		<div class="section">
+		<span class="rightadj">Clock In</span>
+		</div>
+		
+		<div class="section">
+			<ul id="clockin">
+			</ul>
+		</div>
+		</div>
+		
+		<div style="display:none" class="section" id="loading">
+			<ul><li>Loading...</li></ul>
+		</div>
+		
+		<div class="section" id="footer">
+		<span class="rightadj"><span id="slashes">//</span>&nbsp;&copy;&nbsp;braverobot.net&nbsp;<span id="slashes">//</span></span>
+		</div>
+	</div></body>
+</html>
